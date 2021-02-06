@@ -119,6 +119,22 @@ def empirical_distribution_function(t_array):
     return func
 
 
+def coefficient_aging(moments):
+    return (
+        m[0],
+        m[1] / 2,
+        m[2] / 6,
+        m[3] / 24
+    )
+
+
+def is_aging(coef_aging):
+    eq_1 = coef_aging[2] * coef_aging[0] - coef_aging[1] ** 2
+    eq_2 = coef_aging[3] * coef_aging[1] - coef_aging[2] ** 2
+    print("M_3 * M_1 - M_2 ^ 2 = %f\nM_4 * M_2 - M_3 ^ 2 = %f" % (eq_1, eq_2))
+    return eq_1 <= 0 and eq_2 <= 0
+
+
 if __name__ == '__main__':
     t_array = get_t_array()
     n = len(t_array)
@@ -137,6 +153,14 @@ if __name__ == '__main__':
     print("Результаты расчета первых четырех центральных несмещенных моментов")
     print("mu_1 = %f\nmu_2_H = %f\ndelta_H = %f\nSk_H = %f\nEx_H = %f" % (m[0], mu_H[1], delta_h, sk_H, ex_H))
     print("<------------------------------------------------------------------------------>")
+    coef_aging = coefficient_aging(m)
+    print("M_1 = %f\nM_2 = %f\nM_3 = %f\nM_4 = %f" % coef_aging)
+    if is_aging(coef_aging):
+        print("Критерий выполнен, распределение относистся к \"стареющим\"")
+        print("<------------------------------------------------------------------------------>")
+    else:
+        print("Критерий невыполнен, распределение не относистся к \"стареющим\"")
+        print("<------------------------------------------------------------------------------>")
     f_e = empirical_distribution_function(t_array)
     t_start = 0
     t_end = int(max(t_array)) + 50
