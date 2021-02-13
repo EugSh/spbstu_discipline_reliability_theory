@@ -2,8 +2,8 @@ import math
 import numpy
 
 from scipy.optimize import fsolve
-from sympy import symbols, gamma, exp, integrate, plot, Array, summation, Heaviside, Abs, init_printing, pprint, solve, \
-    diff, sqrt, pi, lambdify, pretty
+from sympy import symbols, gamma, exp, integrate, plot, Array, summation, Heaviside, Abs, init_printing, sqrt, pi, \
+    lambdify, pretty
 
 from chapter_1 import point_estimates_4_sample_starting_moments, estimates_first_4_central_moments, \
     estimates_4_unbiased_center_moments
@@ -25,7 +25,7 @@ def get_gamma_function_parameters(T, D):
 def density_of_probability_of_operating_time_failure(a_param, lambda_param):
     """
     :param a_param: параметр формы
-    :param lambda_param: тпараметр масштаба
+    :param lambda_param: параметр масштаба
     :return: кортеж - символьная функция плотности вероятности и аргумент этой функции
     """
     t = symbols("t")
@@ -70,6 +70,11 @@ def approximated_gamma_skewness_excess(a):
 
 
 def get_symbolic_empirical_distribution_function(t_array):
+    """
+    Возвращает символьное представление эмпирической функции
+    :param t_array: исходные измерения
+    :return: эмпирическая функция распределения
+    """
     ar = Array(t_array)
     n = len(t_array)
     i, x_arg = symbols("i x", integer=True)
@@ -99,6 +104,11 @@ def criterion_kolmogorov(empirical, theoretical, arg, n, bound, alfa):
 
 
 def weibull_params(T, D):
+    """
+    :param T: мат ожидание
+    :param D: дисперсия
+    :return: кортеж - параметр формы и параметр масштаба
+    """
     a = symbols("a")
     equ = - gamma(1 + 2 / a) / gamma(1 + 1 / a) ** 2 + D / T ** 2 + 1
     lambdify_equ = lambdify(a, equ, modules=['numpy'])
@@ -110,6 +120,11 @@ def weibull_params(T, D):
 
 
 def get_weibull_distribution(a_params, b_params):
+    """
+    :param a_params: параметр формы
+    :param b_params: параметр масштаба
+    :return: функция распределения вейбула
+    """
     t = symbols("t")
     return (
         1 - exp(-(t / b_params) ** a_params),
@@ -132,19 +147,17 @@ def approximated_weibull_skewness_excess(a):
     )
 
 
-def gamma_by_sterling(x):
-    return exp(-x) * x ** (x - 1 / 2) * sqrt(2 * pi) * (
-            1 +
-            1 / (12 * x) +
-            1 / (288 * x ** 2) -
-            139 / (51840 * x ** 3) -
-            571 / (2488320 * x ** 4)
-    )
-
-
-def chapter_2_1(t_array, mu_H, bound):
+def analise_with_gamma_function(t_array, bound, gamma_a, gamma_lambda):
+    """
+    Тут происходит все необходимое для разделов (2,3).1.1 и (2,3).1.2
+    вычисляем функцию гамма распределения, импирическую функцию, строим графики, проверяем критейрий колмогорова
+    :param t_array: исходные измерения
+    :param bound: границы рассмотрения, вычисления максимумов и тд
+    :param gamma_a: параметр формы
+    :param gamma_lambda: параметр масштаба
+    :return:
+    """
     n = len(t_array)
-    gamma_a, gamma_lambda = get_gamma_function_parameters(mu_H[0], mu_H[1])
     gamma_density, gamma_arg = density_of_probability_of_operating_time_failure(gamma_a, gamma_lambda)
     gamma_distribution = get_gamma_distribution(gamma_density, gamma_arg)
     empirical_distribution, empirical_arg = get_symbolic_empirical_distribution_function(t_array)
@@ -168,11 +181,18 @@ def chapter_2_1(t_array, mu_H, bound):
     plot_kolmogorov.show()
 
 
-def chapter_2_2(t_array, mu_H, bound):
+def analise_with_weibull_function(t_array, bound, a_param, b_param):
+    """
+     Тут происходит все необходимое для разделов (2,3).2.1 и (2,3).2.2
+    вычисляем функцию распределения вейбула, импирическую функцию, строим графики, проверяем критейрий колмогорова
+    :param t_array: исходные измерения
+    :param bound: границы рассмотрения, вычисления максимумов и тд
+    :param a_param: параметр формы
+    :param b_param: параметр масштаба
+    :return:
+    """
     n = len(t_array)
     empirical_distribution, empirical_arg = get_symbolic_empirical_distribution_function(t_array)
-
-    a_param, b_param = weibull_params(mu_H[0], mu_H[1])
     weibull_distribution, weibull_arg = get_weibull_distribution(a_param, b_param)
     plot = plot_function_overlay(empirical_distribution, empirical_arg, weibull_distribution, weibull_arg, bound)
 
@@ -191,6 +211,29 @@ def chapter_2_2(t_array, mu_H, bound):
     print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n\n\n")
     plot.show()
     plot_kolmogorov.show()
+
+
+def chapter_2_1(t_array, mu_H, bound):
+    """
+    :param t_array: исходные измерения
+    :param mu_H: кортеж в котором интересует матожидание и дисперсия
+    :param bound: границы рассмотрения, вычисления максимумов и тд
+    :return:
+    """
+    gamma_a, gamma_lambda = get_gamma_function_parameters(mu_H[0], mu_H[1])
+    analise_with_gamma_function(t_array, bound, gamma_a, gamma_lambda)
+
+
+def chapter_2_2(t_array, mu_H, bound):
+    """
+    :param t_array: исходные измерения
+    :param mu_H: кортеж в котором интересует матожидание и дисперсия
+    :param bound: границы рассмотрения, вычисления максимумов и тд
+    :return:
+    """
+    n = len(t_array)
+    a_param, b_param = weibull_params(mu_H[0], mu_H[1])
+    analise_with_weibull_function(t_array, bound, a_param, b_param)
 
 
 if __name__ == '__main__':
