@@ -1,6 +1,7 @@
-import matplotlib.pyplot as plt
+import math
 
 from init_array import get_t_array
+import matplotlib.pyplot as plt
 
 
 def estimates_starting_empirical_moments(t_array, k):
@@ -90,7 +91,7 @@ def unbiased_excess(ex, n):
     return (n - 1) / ((n - 2) * (n - 3)) * ((n + 1) * ex + 6)
 
 
-def empirical_distribution_function(t_array):
+def get_empirical_distribution_function(t_array):
     """
     :param t_array: массив наблюдейний
     :return: эмпирическую функцию от t
@@ -121,10 +122,10 @@ def empirical_distribution_function(t_array):
 
 def coefficient_aging(moments):
     return (
-        m[0],
-        m[1] / 2,
-        m[2] / 6,
-        m[3] / 24
+        moments[0],
+        moments[1] / 2,
+        moments[2] / 6,
+        moments[3] / 24
     )
 
 
@@ -161,7 +162,7 @@ if __name__ == '__main__':
     else:
         print("Критерий невыполнен, распределение не относистся к \"стареющим\"")
         print("<------------------------------------------------------------------------------>")
-    f_e = empirical_distribution_function(t_array)
+    f_e = get_empirical_distribution_function(t_array)
     t_start = 0
     t_end = int(max(t_array)) + 50
     t = [i for i in range(t_start, t_end)]
