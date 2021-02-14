@@ -199,8 +199,6 @@ def analise_with_weibull_function(t_array, bound, a_param, b_param):
     sk, ex = approximated_weibull_skewness_excess(a_param)
     theoretical = weibull_distribution.subs(weibull_arg, empirical_arg)
     print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>")
-    print("D/T^2 +1 = %f" % (mu_H[1] / mu_H[0] ** 2 + 1))
-    print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>")
     print("a = %f\nb = %f" % (a_param, b_param))
     print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>")
     print("Sk = %f\nEx = %f" % (sk, ex))
@@ -233,6 +231,8 @@ def chapter_2_2(t_array, mu_H, bound):
     """
     n = len(t_array)
     a_param, b_param = weibull_params(mu_H[0], mu_H[1])
+    print("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>")
+    print("D/T^2 + 1 = %f" % (mu_H[1] / mu_H[0] ** 2 + 1))
     analise_with_weibull_function(t_array, bound, a_param, b_param)
 
 
